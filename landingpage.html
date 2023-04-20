@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(90deg, rgba(0,176,255,1) 0%, rgba(255,0,255,1) 50%, rgba(255,0,0,1) 100%);
+      animation: gradient 5s ease infinite;
+      background-size: 400% 400%;
+    }
+    h1 {
+      font-size: 48px;
+      color: white;
+      opacity: 0;
+      animation: fade-in 1s forwards;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      background-color: #242424;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #5c5c5c;
+    }
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    @keyframes fade-in {
+      0% {opacity: 0;}
+      100% {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+<h1>SMess</h1>
+<button onclick="window.location.href='https://smessauth.auth.us-east-1.amazoncognito.com/login?client_id=49jc2ar9vo1ppgf3dc92jj4ic&response_type=code&scope=email+openid+phone&redirect_uri=http%3A%2F%2Flocalhost'">Sign in</button>
+</body>
+</html>
