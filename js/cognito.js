@@ -115,14 +115,14 @@ function getCurrentUser() {
 }
 
 async function sendMessage(conversationId, message) {
-    const apiEndpoint = 'https://58z24w81cl.execute-api.us-east-1.amazonaws.com/test/sendMessage/';
+    const proxyEndpoint = '/forward'; // Replace with the actual URL where your Go proxy is running
     const payload = {
         conversation_id: conversationId,
         message: message
     };
 
     try {
-        const response = await fetch(apiEndpoint, {
+        const response = await fetch(proxyEndpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,19 +130,40 @@ async function sendMessage(conversationId, message) {
             },
             body: JSON.stringify(payload)
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const jsonResponse = await response.json();
-        return jsonResponse;
+        result = await response;
+        console.log(result)
+        return result;
     } catch (error) {
-        console.error('Error calling API Gateway endpoint:', error);
+        console.error('Error calling Go intermediary:', error);
         throw error;
     }
 }
 
+async function getMessages(conversationId, timestamp) {
+    const proxyEndpoint = '/forward'; // Replace with the actual URL where your Go proxy is running
+    const payload = {
+        conversation_id: conversationId,
+        timestamp: timestamp
+    };
+
+    try {
+        const response = await fetch(proxyEndpoint, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'id_token': getCookie("id_token"),
+                'conversation_id': conversationId,
+                'timestamp': timestamp,
+            },
+        });
+        result = await response;
+        console.log(result)
+        return result;
+    } catch (error) {
+        console.error('Error calling Go intermediary:', error);
+        throw error;
+    }
+}
 
 
 // Helper function

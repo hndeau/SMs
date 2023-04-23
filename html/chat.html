@@ -7,6 +7,7 @@
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.554.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
     <script src="/js/cognito.js"></script>
+    <script src="/js/chat.js"></script>
     <link rel="stylesheet" href="/css/chat.css">
 </head>
 <body>
@@ -19,7 +20,11 @@
 <div id="chat">
     <h4 id="recipient">John</h4>
     <div id="messages">
-        <!-- Chat messages will be appended here -->
+        <script>
+            const users = [document.getElementById('recipient').textContent, document.getElementById('username').textContent].sort();
+            getMessages(users[0] + '-' + users[1], 0);
+            // document.getElementById('messages').textContent = messages;
+        </script>
     </div>
     <div id="input-container">
         <form id="input-form">
@@ -34,11 +39,10 @@
     document.getElementById('input-form').addEventListener('submit', async function (event) {
         event.preventDefault(); // prevent the form from submitting normally
 
-        const recipient = document.getElementById('recipient').value;
-        const username = document.getElementById('username').value;
+        const users = [document.getElementById('recipient').textContent, document.getElementById('username').textContent].sort();
         const message = document.getElementById('text-input').value;
-
-        await sendMessage(recipient + '-' + username, message);
+        await sendMessage(users[0] + '-' + users[1], message);
+        document.getElementById('messages').textContent = await getMessages(users[0] + '-' + users[1], Date.now());
     });
 </script>
 </body>
