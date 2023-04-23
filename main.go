@@ -5,10 +5,14 @@ import (
 	"net/http"
 	"path/filepath"
 	"runtime"
-	"time"
 )
 
-var appClientID = ""
+func serveStaticFile(currentDir string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := filepath.Join(currentDir, r.URL.Path[1:])
+		http.ServeFile(w, r, path)
+	})
+}
 
 func main() {
 	// Get the current file's path
@@ -17,29 +21,34 @@ func main() {
 	// Get the directory of the current file
 	currentDir := filepath.Dir(currentFilePath)
 
+	// Serve static files
+	http.Handle("/js/", serveStaticFile(currentDir))
+	http.Handle("/css/", serveStaticFile(currentDir))
+	http.Handle("/html/", serveStaticFile(currentDir))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Read the "code" URL parameter
-		code := r.URL.Query().Get("code")
+		http.ServeFile(w, r, filepath.Join(currentDir, "html/landingpage.html")) // Assuming the HTML file is named "index.html"
+	})
 
-		if code != "" {
-			// If "code" is provided, create a cookie named "token" with the value of "code"
-			token := &http.Cookie{
-				Name:    "token",
-				Value:   code,
-				Expires: time.Now().Add(30 * 24 * time.Hour), // Cookie expires in 30 days
-				Path:    "/",
-			}
-			http.SetCookie(w, token)
-		}
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(currentDir, "html/login.html")) // Assuming the HTML file is named "index.html"
+	})
 
-		http.ServeFile(w, r, filepath.Join(currentDir, "landingpage.html")) // Assuming the HTML file is named "index.html"
+	http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(currentDir, "html/callback.html")) // Assuming the HTML file is named "index.html"
 	})
 
 	http.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(currentDir, "chat.html")) // Assuming the HTML file is named "index.html"
+		http.ServeFile(w, r, filepath.Join(currentDir, "html/chat.html")) // Assuming the HTML file is named "index.html"
 	})
 
-	http.ListenAndServe(":8080", nil)
+	// Add the /cognito handler
+	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		cognitoURL := "https://smessauth.auth.us-east-1.amazoncognito.com/signup?client_id=34mgjfocrlfp3c4ij35qoe8d4b&response_type=token&scope=email+openid+phone&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback"
+		http.Redirect(w, r, cognitoURL, http.StatusFound)
+	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.ListenAndServe("80", nil)
+
+	log.Fatal(http.ListenAndServe(":80", nil))
 }

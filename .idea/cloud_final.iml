@@ -6,5 +6,12 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="aws-sdk-2.554.0" level="application" />
+    <orderEntry type="library" name="aws-amplify" level="application" />
+    <orderEntry type="library" name="amazon-cognito-identity-js" level="application" />
+    <orderEntry type="library" name="aws-sdk-2.950.0" level="application" />
+    <orderEntry type="library" name="aws-sdk" level="application" />
+    <orderEntry type="library" name="aws-sdk-2.283.1" level="application" />
+    <orderEntry type="library" name="aws-sdk-2.1.12" level="application" />
   </component>
 </module>
