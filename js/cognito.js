@@ -41,22 +41,16 @@ function signIn() {
 
 function signOut() {
     var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-    var userData = {
-        Username: authenticationData.Username,
-        Pool: userPool,
-    };
-    cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-    // Get the current user from local storage, if available
-    const currentUser = cognitoIdentityServiceProvider.getCurrentUser();
+    cognitoUser = userPool.getCurrentUser();
 
-    if (currentUser !== null) {
-        // If the current user is loaded in memory, sign them out
-        currentUser.signOut(() => {
-            console.log('User signed out successfully');
-        });
+    if (cognitoUser !== null) {
+        cognitoUser.signOut();
+        console.log('User signed out successfully');
     } else {
         console.log('No user is currently loaded in memory');
     }
+    // Redirect to /login after successful sign up
+    window.location.href = '/';
 }
 
 function signUp() {
@@ -68,7 +62,13 @@ function signUp() {
 
     var username = document.getElementById('signup-username').value;
     var password = document.getElementById('signup-password').value;
+    var confirmPassword = document.getElementById('signup-confirm-password').value;
     var email = document.getElementById('signup-email').value;
+
+    if (password !== confirmPassword) {
+        document.getElementById('error-response').innerText = 'Passwords do not match.';
+        return;
+    }
 
     var attributeList = [
         new AmazonCognitoIdentity.CognitoUserAttribute({
@@ -79,13 +79,17 @@ function signUp() {
 
     userPool.signUp(username, password, attributeList, null, (err, result) => {
         if (err) {
-            console.log(err);
+            document.getElementById('error-response').innerText = err.message || JSON.stringify(err);
             return;
         }
         cognitoUser = result.user;
         console.log('User signed up:', cognitoUser.getUsername());
+
+        // Redirect to /login after successful sign up
+        window.location.href = '/login';
     });
 }
+
 
 function getCurrentUser() {
     // Get the access token from cookies
@@ -115,12 +119,13 @@ function getCurrentUser() {
 }
 
 async function sendMessage(conversationId, message) {
-    const proxyEndpoint = '/forward'; // Replace with the actual URL where your Go proxy is running
+    const proxyEndpoint = '/send'; // Replace with the actual URL where your Go proxy is running
     const payload = {
         conversation_id: conversationId,
         message: message
     };
 
+    let result;
     try {
         const response = await fetch(proxyEndpoint, {
             method: 'POST',
@@ -140,7 +145,7 @@ async function sendMessage(conversationId, message) {
 }
 
 async function getMessages(conversationId, timestamp) {
-    const proxyEndpoint = '/forward'; // Replace with the actual URL where your Go proxy is running
+    const proxyEndpoint = '/retrieve'; // Replace with the actual URL where your Go proxy is running
     const payload = {
         conversation_id: conversationId,
         timestamp: timestamp
@@ -148,13 +153,12 @@ async function getMessages(conversationId, timestamp) {
 
     try {
         const response = await fetch(proxyEndpoint, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'id_token': getCookie("id_token"),
-                'conversation_id': conversationId,
-                'timestamp': timestamp,
+                'id_token': getCookie("id_token")
             },
+            body: JSON.stringify(payload)
         });
         result = await response;
         console.log(result)

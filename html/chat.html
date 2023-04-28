@@ -20,11 +20,11 @@
 <div id="chat">
     <h4 id="recipient">John</h4>
     <div id="messages">
-        <script>
-            const users = [document.getElementById('recipient').textContent, document.getElementById('username').textContent].sort();
-            getMessages(users[0] + '-' + users[1], 0);
-            // document.getElementById('messages').textContent = messages;
-        </script>
+<!--        <script>-->
+<!--            const users = [document.getElementById('recipient').textContent, document.getElementById('username').textContent].sort();-->
+<!--            getMessages(users[0] + '-' + users[1], 0);-->
+<!--            // document.getElementById('messages').textContent = messages;-->
+<!--        </script>-->
     </div>
     <div id="input-container">
         <form id="input-form">
@@ -42,7 +42,7 @@
         const users = [document.getElementById('recipient').textContent, document.getElementById('username').textContent].sort();
         const message = document.getElementById('text-input').value;
         await sendMessage(users[0] + '-' + users[1], message);
-        document.getElementById('messages').textContent = await getMessages(users[0] + '-' + users[1], Date.now());
+        document.getElementById('messages').textContent = await (await getMessages(users[0] + '-' + users[1], Date.now())).text();
     });
 </script>
 </body>
